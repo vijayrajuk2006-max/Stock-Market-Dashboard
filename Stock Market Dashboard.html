@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Market Dashboard</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#111827;
+      color:white;
+      padding:20px;
+    }
+
+    .container{
+      max-width:1200px;
+      margin:auto;
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:20px;
+      color:#f9fafb;
+    }
+
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .controls input,
+    .controls select{
+      flex:1;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      outline:none;
+      background:#1f2937;
+      color:white;
+    }
+
+    .dashboard{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:20px;
+    }
+
+    .card{
+      background:#1f2937;
+      padding:20px;
+      border-radius:14px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.3);
+      transition:0.3s;
+    }
+
+    .card:hover{
+      transform:translateY(-5px);
+    }
+
+    .card h2{
+      margin-bottom:10px;
+      font-size:22px;
+    }
+
+    .price{
+      font-size:28px;
+      font-weight:bold;
+      margin:10px 0;
+    }
+
+    .green{
+      color:#22c55e;
+    }
+
+    .red{
+      color:#ef4444;
+    }
+
+    .meta{
+      margin-top:10px;
+      color:#d1d5db;
+      line-height:1.6;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:5px 10px;
+      border-radius:8px;
+      font-size:12px;
+      margin-top:10px;
+      background:#374151;
+    }
+
+    .empty{
+      text-align:center;
+      padding:30px;
+      color:#9ca3af;
+      font-size:18px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📈 Stock Market Dashboard</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search company...">
+    <select id="filterType">
+      <option value="All">All Stocks</option>
+      <option value="Gainers">Gainers</option>
+      <option value="Losers">Losers</option>
+    </select>
+  </div>
+
+  <div class="dashboard" id="dashboard"></div>
+</div>
+
+<script>
+const stocks = [
+  { name:"TCS", price:3780, change:+2.4, volume:"1.2M", sector:"IT" },
+  { name:"Infosys", price:1545, change:-1.2, volume:"980K", sector:"IT" },
+  { name:"Reliance", price:2860, change:+0.8, volume:"2.5M", sector:"Energy" },
+  { name:"HDFC Bank", price:1680, change:-0.6, volume:"1.8M", sector:"Banking" },
+  { name:"ICICI Bank", price:1125, change:+1.7, volume:"1.1M", sector:"Banking" },
+  { name:"Wipro", price:540, change:-2.1, volume:"760K", sector:"IT" },
+  { name:"Adani Ports", price:1450, change:+3.1, volume:"840K", sector:"Infrastructure" },
+  { name:"SBI", price:845, change:+0.4, volume:"2.0M", sector:"Banking" }
+];
+
+const dashboard = document.getElementById("dashboard");
+const searchInput = document.getElementById("searchInput");
+const filterType = document.getElementById("filterType");
+
+function displayStocks(data){
+  dashboard.innerHTML = "";
+
+  if(data.length === 0){
+    dashboard.innerHTML = `<div class="empty">No stocks found</div>`;
+    return;
+  }
+
+  data.forEach(stock => {
+    const colorClass = stock.change >= 0 ? "green" : "red";
+    const sign = stock.change >= 0 ? "+" : "";
+
+    dashboard.innerHTML += `
+      <div class="card">
+        <h2>${stock.name}</h2>
+        <div class="price">₹${stock.price}</div>
+        <div class="${colorClass}">
+          ${sign}${stock.change}% today
+        </div>
+        <div class="meta">
+          Volume: ${stock.volume}<br>
+          Sector: ${stock.sector}
+        </div>
+        <div class="tag">${stock.change >= 0 ? "Gainer" : "Loser"}</div>
+      </div>
+    `;
+  });
+}
+
+function filterStocks(){
+  const search = searchInput.value.toLowerCase();
+  const type = filterType.value;
+
+  let filtered = stocks.filter(stock =>
+    stock.name.toLowerCase().includes(search)
+  );
+
+  if(type === "Gainers"){
+    filtered = filtered.filter(stock => stock.change >= 0);
+  }
+  else if(type === "Losers"){
+    filtered = filtered.filter(stock => stock.change < 0);
+  }
+
+  displayStocks(filtered);
+}
+
+searchInput.addEventListener("input", filterStocks);
+filterType.addEventListener("change", filterStocks);
+
+displayStocks(stocks);
+</script>
+
+</body>
+</html>5
